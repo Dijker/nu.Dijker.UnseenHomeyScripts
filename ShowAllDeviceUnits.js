@@ -32,12 +32,20 @@ arrDev.sort(function(a, b) {
     return 0;
 });
 
+hashCode = function(s){
+  return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);              
+};
+function toHex(d) {
+    d = d<0?d*=-1:d;
+    return  ("0000000"+(Number( d).toString(16))).slice(-8).toUpperCase()
+}; 
+
 console.log('Devices');
 console.log('=======');
 let antal = 0;
 
 // let fields = [['Zon', 'zone.name'], ['Namn', 'name'], ['Påslagen', 'state.onoff'], ['Tillverkare', 'driver.owner_name'], ['Modell', 'driver.id'], ['ID', 'id'], ['Styrbart', 'capabilitiesArray']];
-let fields = [['Zone', 'zone.name'], ['Name', 'name'], ['State', 'state.onoff'], ['BrandName', 'driver.owner_name'], ['Model', 'driver.id'], ['ID', 'id'], ['Capabilities', 'capabilitiesArray'],['addressID', 'data.id']];
+let fields = [['Zone', 'zone.name'], ['Name', 'name'], ['State', 'state.onoff'], ['BrandName', 'driver.owner_name'], ['Model', 'driver.id'], ['ID', 'id'], ['Capabilities', 'capabilitiesArray'],['dataHash', ''],['DataObj', 'data']];
 
 let fieldNames = [];
 fields.forEach(f => { fieldNames.push(f[0]); });
@@ -46,15 +54,22 @@ console.log(fieldNames.join('\t'));
 arrDev.forEach(d => {
     let row = [];
     fields.forEach(f => { 
-        let args = f[1].split('.');
-        let currValue = d;
-        for(let i = 0; i < args.length; i++) {
-            currValue = currValue[args[i]];
+        if (f[1] != '') {
+            let args = f[1].split('.');
+            let currValue = d;
+            for(let i = 0; i < args.length; i++) {
+                currValue = currValue[args[i]];
+            }
+            if(Array.isArray(currValue)) {
+                currValue = currValue.join(', ');
+            } else {
+                if (currValue !== null && typeof currValue === 'object') {
+                    currValue = JSON.stringify(currValue);
+                    row.push( toHex( hashCode(currValue) ) );
+                }    
+            };
+            row.push(currValue);
         }
-        if(Array.isArray(currValue)) {
-            currValue = currValue.join(', ');
-        }
-        row.push(currValue);
     });
     console.log(row.join('\t'));
 });
