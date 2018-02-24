@@ -19,18 +19,17 @@
     Enjoy your Homey time!!!
     Regards The Homey Community! 
 */
-
+// Choose the new Zone Name
+let newZoneName = "My Awesome Zone"
+// Choose your icon from: ["bed","books","default","garden","home","kitchen","living","roof","shower","stairs-down","stairs-up","toilet"]
+let newIconName  =  "garden"; // #@%#@^$&#4 Aaaaahhhhhh.... doesn't work on 1.5.6! Sorry...
+// Sorry, setting correct Icon also broken in 1.5.6 !! 
+// Choose the base zone 
+let BaseZone = 'Home';
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-[ Do NOT modify below this line!! ]-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 async function main(){
     await listIconNames();
     await listZonesAndIDs();
-    // Choose the new Zone Name
-    let newZoneName = "My Awesome Zone"
-    // Choose your icon from: ["bed","books","default","garden","home","kitchen","living","roof","shower","stairs-down","stairs-up","toilet"]
-    let newIconName  =  "garden"; // #@%#@^$&#4 Aaaaahhhhhh.... doesn't work on 1.5.6! Sorry...
-    // Sorry, setting correct Icon also broken in 1.5.6 !! 
-    // Choose the base zone 
-    let BaseZone = 'Home';
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-[ No need to modify below this line!! ]-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     let newBaseZoneID = await getBaseZoneID(BaseZone);
     // let newBaseZoneID = '855113f1-f488-4223-b675-2f01270f573e';
     var  newZone  = {};
