@@ -45,8 +45,11 @@ function main() {
   log ('> manufacturerNames   : ' +  JSON.stringify( manufacturerName ) );
   log ('# modelIds            : ' + objectLength( modelId ));
   log ('> modelIds            : ' + JSON.stringify( modelId )  );
-  let routesPerHops = anlyzeRoutes(routes);
-  listBadRoutes(badRouteIDs);
+  let routesPerHops = analyzeRoutes(routes);
+  listBadRoutes(badRouteIDs, 'Devices with Error in Route', 'Error in route from: ');
+  listBadRoutes(activeRouteIDs, 'Devices active Routing', 'Active Router: ');
+  // activeRouteIDs
+
   // log ('Routers    : ', routers);
   // listDevicenames();
   // log( 'Device Names       :', objectLength(devices) , ' ',JSON.stringify( getNames( devices )));
@@ -67,6 +70,8 @@ let resultStr = '';
 let SysInfo = await Homey.system.getInfo();
 let HomeyName = await Homey.system.getSystemName();
 var badRouteIDs = [];
+var activeRouteIDs = [];
+
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-[ functions ]-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function filterObjects(objs, _key, value) {
   var result=[];
@@ -105,16 +110,18 @@ function objectLength(obj) {
     return result;
 };
 
-function anlyzeRoutes(obj) {
+function analyzeRoutes(obj) {
   var result = [];
   var list = [];
-  // log ('Start anlyzeRoutes:', obj );
+  // log ('Start analyzeRoutes:', obj );
   var max = 1;
   _(obj).forEach( function (route) {
     if (objectLength(route) > max) {
       max=(objectLength (route)) 
     }
   })
+  // activeRouteIDs.
+
   for(var i = 0; i <= (max+1); i++) {
     result.push(0);
   }
@@ -131,10 +138,16 @@ function anlyzeRoutes(obj) {
       if (list.indexOf(''+routeID) < 0) { 
         badRouteIDs.push(list[i])
         result[0]++ 
+      } else {
+          // log ('rr ' , routeID );
+          activeRouteIDs.push(routeID);
       }
-    })
+    });
     i++
   })
+  // log ('activeRouteIDs 1: ', activeRouteIDs);
+  activeRouteIDs = _.uniq( activeRouteIDs );
+  // log ('activeRouteIDs 2: ', activeRouteIDs);
   log ('# hops used for device-' , [ 'B',0,1,2,3,4] );
   log ('result # Routes/hops  :' , result );
   return result;
@@ -183,15 +196,16 @@ function getDeviceName(deviceID) {
   return result
 };
 
-function listBadRoutes (badIDs) {
-  logLine ('Devices with Error in Route')
+function listBadRoutes (badIDs, myTitle) {
+  logLine (myTitle)
   // log ('(badIDs:', badIDs)
   _(badIDs).forEach( function (ID) {
     var devName = getDeviceName (ID);
     if (devName === '') {
       devName = 'Unknown device'
     }
-    log ( 'Error in route from: ' + devName );
+    // log ( 'Error in route from: ' + devName );
+    log (  devName );
   })
 };
 
