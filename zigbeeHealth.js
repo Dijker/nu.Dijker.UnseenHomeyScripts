@@ -12,7 +12,7 @@ let userResetZigbeeOnv5 = false  // Did you Reset Zigbee in v5 or start with v5?
  *
  * @file    0.1-zigbeeHealth.js by Geurt Dijker
  * @author  Geurt Dijker <Homey.Apps@dijker.nu>
- * @version 1.0.1
+ * @version 1.0.4
  * @link    https://github.com/Dijker/ (Link to be ceated)
  * @since
  * @license GNU General Public License v3.0 @see distribution
@@ -185,12 +185,13 @@ Number.prototype.toDDHHMMSS = function() {
     ].filter(s => s).join(':');
 }
 
+
 function getDeviceName(deviceID) {
   var result = '';
   _(zigBeeState.nodes).forEach( function (node ) { 
     if ( node.nwkAddr == deviceID ) {
       // log ( 'BadRoute Node Name = ' + node.name )
-      result = node.name
+      result = node.manufacturerName + ' - ' + node.modelId + ' - ' + node.name
     }
   })
   return result
