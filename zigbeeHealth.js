@@ -9,20 +9,20 @@ let userHappiness = 9            // your Happiness with Zigbee in Homey Firmware
 let userResetZigbeeOnv5 = false  // Did you Reset Zigbee in v5 or start with v5?
 let anonymizeNames = false       // Show IDs, not names - value: true/false 
 /* 
- * Check your Homey's zigbee Health (and maybe fix?).
+ * Check your Homey's zigbee Health.
  *
- * @file    0.1-zigbeeHealth.js by Geurt Dijker
+ * @file    zigbeeHealthCheck.js by Geurt Dijker
  * @author  Geurt Dijker <Homey.Apps@dijker.nu>
  * @version 1.0.6
  * @link    https://github.com/Dijker/ (Link to be ceated)
  * @since
  * @license GNU General Public License v3.0 @see distribution
  * 20210307 First published on Community forum 
- * 20210307 Added Tips/Link for No Avtive Routers  
+ * 20210307 Added Tips/Link for No Avtive Routers and Healt advices
  * 20210306 Added logging active Routers (Thanks @Ted for sugestion)  
  * 20210306 test badroute device logging 
  * 20210228 Addes Routing info 
- * 2021~~~~ Manny versions and hours before 1.0.0
+ * 2021~~~~ Many tests hours before 1.0.0
  */
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-[ Configure the checks ]-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function main() {
@@ -49,8 +49,11 @@ function main() {
   log('> modelIds            : ' + JSON.stringify(modelId));
   let routesPerHops = analyzeRoutes(routes);
   logLine ('3b: routing is an ephemeral state and may change at any time ')
-  log('# hops used for device-', ['B', 0, 1, 2, 3, 4]);
-  log('result # Routes/hops  :', routesPerHops);
+  // log('# hops used for device-', ['B', 0, 1, 2, 3, 4]);
+  log(' # Bad Routes    :', routesPerHops[0]);
+   for (var i = 1; i < objectLength(routesPerHops); i++) {
+    log(' # Routes ' + (i-1) + ' hops :', routesPerHops[i]);
+   }
   if (objectLength(badRouteIDs) > 0) {
     logLine('4: Devices with Error in Route')
     listDevices(badRouteIDs);
@@ -71,7 +74,25 @@ function main() {
                   nodes, objectLength(routers), objectLength(endDevice), objectLength(manufacturerName),
                   objectLength(modelId), objectLength(activeRouteIDs))
   resultObj = resultObj.concat('#', routesPerHops);
-  logLine('6: Zigbee Reporting Data')
+  logLine('6: Zigbee Health Advices')
+  var zigbeeHealthAdvice = false
+  if ((objectLength(activeRouteIDs) < 4) | 
+      (objectLength(routers) < 5) |
+      (objectLength(endDevice) > (objectLength(routers)*5))) {
+    var zigbeeHealthAdvice = true
+    log ('Please add more zigBee Routers to create a better mesh network')
+    log ('You only have ' + objectLength(routers) + ' routers for ' + objectLength(endDevice) + ' end-devices ')
+    log ('For more info read \n' + 
+    ' https://support.athom.com/hc/en-us/articles/360019239879-Advice-on-building-a-stable-Zigbee-network')
+  }
+  if (objectLength(badRouteIDs) > 0) {
+    var zigbeeHealthAdvice = true
+    log ('Try fixing the device with bad routes')
+    log ('For more info read \n' + 
+    ' https://community.athom.com/t/fixing-disconnected-zigbee-devices-without-having-to-modify-all-flows/37896')
+  }
+  if (!zigbeeHealthAdvice) {log ('Curently no advices')}
+  logLine('7: Zigbee Reporting Data')
   resultStr = JSON.stringify(resultObj).replace('[', '').replace(']', '')
   log('> reporting : ', resultStr, ', $');
 
