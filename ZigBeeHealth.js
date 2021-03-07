@@ -235,4 +235,4 @@ function listDevices(badIDs) {
 let zigBeeState = await Homey.zigBee.getState();
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-[ call main ]-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 main();
-return 'Please report above text back on Community'
+return 'Please report above text back on Community https://community.athom.com/t/44231 '
