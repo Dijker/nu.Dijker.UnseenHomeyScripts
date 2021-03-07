@@ -7,7 +7,7 @@
  *   value: true/false */
 let userHappiness = 9            // your Happiness with Zigbee in Homey Firmware v5 
 let userResetZigbeeOnv5 = false  // Did you Reset Zigbee in v5 or start with v5?
-let anonymizeNames = false       // Show IDs, not names - value: true/false 
+let anonymizeNames = true        // Show IDs, not names - value: true/false 
 /* 
  * Check your Homey's zigbee Health.
  *
@@ -24,9 +24,8 @@ let anonymizeNames = false       // Show IDs, not names - value: true/false
  * 20210228 Addes Routing info 
  * 2021~~~~ Many tests hours before 1.0.0
  */
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-[ Configure the checks ]-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-[ Do NOT modify below this line!! ]-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function main() {
-  // Main Procedure. just (un-)comment the info you want or don't want.
   logIDInfo();
   var routes = zigBeeState.controllerState.routes;
   delete zigBeeState.controllerState.routes
@@ -96,8 +95,7 @@ function main() {
   resultStr = JSON.stringify(resultObj).replace('[', '').replace(']', '')
   log('> reporting : ', resultStr, ', $');
 
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-[ Do NOT modify below this line!! ]-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-}; // end of main()
+ }; // end of main()
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-[ first get all Homey's info global ]-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 let scriptVersion = 2;
@@ -140,7 +138,6 @@ function objectLength(obj) {
   var result = 0;
   for (var prop in obj) {
     if (obj.hasOwnProperty(prop)) {
-      // or Object.prototype.hasOwnProperty.call(obj, prop)
       result++;
     }
   }
@@ -157,19 +154,15 @@ function analyzeRoutes(obj) {
       max = (objectLength(route))
     }
   })
-  // activeRouteIDs.
 
   for (var i = 0; i <= (max + 1); i++) {
     routingHopsUsed.push(0);
   }
   for (var property in obj) {
-    // log ('routeX ' + property )
     list.push(property)
   }
-  // log ('NodeIDs = ', list );
   var i = 0
   _(obj).forEach(function (route) {
-    // log ('(objectLength (route)', (objectLength (route)), route)
     routingHopsUsed[(objectLength(route) + 1)]++;
     _(route).forEach(function (routeID) {
       if (list.indexOf('' + routeID) < 0) {
@@ -182,9 +175,7 @@ function analyzeRoutes(obj) {
     });
     i++
   })
-  // log ('activeRouteIDs 1: ', activeRouteIDs);
   activeRouteIDs = _.uniq(activeRouteIDs);
-  // log ('activeRouteIDs 2: ', activeRouteIDs);
   return routingHopsUsed;
 };
 
@@ -220,12 +211,12 @@ Number.prototype.toDDHHMMSS = function () {
   ].filter(s => s).join(':');
 }
 
-
 function getDeviceDescription(deviceID) {
   var deviceDescription = '';
   _(zigBeeState.nodes).forEach(function (node) {
     if (node.nwkAddr == deviceID) {
-      deviceDescription = '' + (anonymizeNames ? node.nwkAddr : node.name) + ' - (' + node.manufacturerName + ' - ' + node.modelId + ')'
+      deviceDescription = '' + (anonymizeNames ? node.nwkAddr : node.name) + 
+      ' - (' + node.manufacturerName + ' - ' + node.modelId + ')'
     }
   })
   if (deviceDescription === '') {
