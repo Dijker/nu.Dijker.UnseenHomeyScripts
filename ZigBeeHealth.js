@@ -5,9 +5,9 @@
  *   value 1-10 : 1 = poor 10 = Good/Best
  * - did you Reset Zigbee in v5 or start with v5? 
  *   value: true/false */
-let userHappiness = 9            // your Happiness with Zigbee in Homey Firmware v5 
+let userHappiness = 0            // your Happiness with Zigbee in Homey Firmware v5 
 let userResetZigbeeOnv5 = false  // Did you Reset Zigbee in v5 or start with v5?
-let anonymizeNames = false       // Show IDs, not names - value: true/false 
+let anonymizeNames = true       // Show IDs, not names - value: true/false 
 /* 
  * Check your Homey's zigbee Health.
  *
@@ -18,6 +18,7 @@ let anonymizeNames = false       // Show IDs, not names - value: true/false
  * @since
  * @license GNU General Public License v3.0 @see distribution
  * 20210326 Check for WELL-KNOWN KEYS (CVE-2020-28952) 
+ * 20210308 Changed default userHappiness
  * 20210307 First published on Community forum 
  * 20210307 Added Tips/Link for No Avtive Routers and Health advices
  * 20210306 Added logging active Routers (Thanks @Ted for sugestion)  
