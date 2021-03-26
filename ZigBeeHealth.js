@@ -5,19 +5,19 @@
  *   value 1-10 : 1 = poor 10 = Good/Best
  * - did you Reset Zigbee in v5 or start with v5? 
  *   value: true/false */
-let userHappiness = 0            // your Happiness with Zigbee in Homey Firmware v5 
+let userHappiness = 9            // your Happiness with Zigbee in Homey Firmware v5 
 let userResetZigbeeOnv5 = false  // Did you Reset Zigbee in v5 or start with v5?
-let anonymizeNames = true        // Show IDs, not names - value: true/false 
+let anonymizeNames = false       // Show IDs, not names - value: true/false 
 /* 
  * Check your Homey's zigbee Health.
  *
  * @file    zigbeeHealthCheck.js by Geurt Dijker
  * @author  Geurt Dijker <Homey.Apps@dijker.nu>
- * @version 1.0.8
+ * @version 1.0.9
  * @link    https://github.com/Dijker/ (Link to be ceated)
  * @since
  * @license GNU General Public License v3.0 @see distribution
- * 20210308 Changed default userHappiness
+ * 20210326 Check for WELL-KNOWN KEYS (CVE-2020-28952) 
  * 20210307 First published on Community forum 
  * 20210307 Added Tips/Link for No Avtive Routers and Health advices
  * 20210306 Added logging active Routers (Thanks @Ted for sugestion)  
@@ -31,6 +31,7 @@ function main() {
   var routes = zigBeeState.controllerState.routes;
   delete zigBeeState.controllerState.routes
   logLine('1: ZigBee controllerState RAW data')
+  let wellKnownKey = (zigBeeState.controllerState.networkKey === "01:03:05:07:09:0b:0d:0f:00:02:04:06:08:0a:0c:0d") 
   log('controllerState => ', JSON.stringify(zigBeeState.controllerState).split(',').join(',\n') + '\'');
   let nodes = objectLength(zigBeeState.nodes);
   let routers = filterObjects(zigBeeState.nodes, "type", "Router");
@@ -72,10 +73,17 @@ function main() {
                   zigBeeState.controllerState.channel, zigBeeState.controllerState.chipVersion,
                   zigBeeState.controllerState.transportRev, zigBeeState.controllerState.zstackVersion,
                   nodes, objectLength(routers), objectLength(endDevice), objectLength(manufacturerName),
-                  objectLength(modelId), objectLength(activeRouteIDs))
+                  objectLength(modelId), objectLength(activeRouteIDs),wellKnownKey)
   resultObj = resultObj.concat('#', routesPerHops);
   logLine('6: Zigbee Health Advices')
   var zigbeeHealthAdvice = false
+  // wellKnownKey
+  if (wellKnownKey) {
+    var zigbeeHealthAdvice = true
+    log ('Well-Known-Key used (CVE-2020-28952)')
+    log ('For more info read \n' + 
+        'https://yougottahackthat.com/blog/1260/athom-homey-security-static-and-well-known-keys-cve-2020-28952')
+  }
   if ((objectLength(activeRouteIDs) < 4) | 
       (objectLength(routers) < 5) |
       (objectLength(endDevice) > (objectLength(routers)*5))) {
@@ -99,7 +107,7 @@ function main() {
  }; // end of main()
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-[ first get all Homey's info global ]-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-let scriptVersion = 2;
+let scriptVersion = 3;
 let resultStr = '';
 let SysInfo = await Homey.system.getInfo();
 let HomeyName = await Homey.system.getSystemName();
